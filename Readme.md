@@ -97,7 +97,7 @@ If everything up to this point was done correctly, you should be able to access 
 
 ## References
   - [Ubuntu download link][Dwld]
-  - [Original OpenSTF website [OStf]
+  - [Original OpenSTF website][OStf]
   - [Docker-compose STF repository][Repo]
   - [Docker-compose STF configuration post][Post]
   - [RethinkDB installation documentation][ReDB]
