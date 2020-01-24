@@ -1,5 +1,7 @@
 # STF Setup
 
+The following steps were done and tested on a virtual machine using **VirtualBox** and **Ubuntu 19.10**
+
 ## Quick Install
 
 To quickly setup everything, you can just open your Ubuntu terminal and run the next command:
@@ -93,12 +95,10 @@ $ sudo docker-compose up -d --build
 
 If everything up to this point was done correctly, you should be able to access the device farm in your browser through the **PUBLIC_IP** you previously defined.
 
-### References
+## References
   - [Original STF repository][Repo]
   - [Original STF configuration post][Post]
   - [RethinkDB installation documentation][ReDB]
-
-The previous steps were done and tested on a virtual machine using **VirtualBox** and **Ubuntu 19.10**
 
 [Repo]: <https://github.com/nikosch86/stf-poc>
 [Post]: <https://medium.com/@nikosch86/getting-started-with-automated-in-house-testing-on-android-smartphones-using-stf-dafecee4a8ee>
