@@ -1,6 +1,6 @@
 # STF Setup
 
-The following steps were done and tested on a virtual machine using **VirtualBox** and **Ubuntu 19.10**
+The following steps were done and tested on a virtual machine using **VirtualBox** with **Ubuntu 19.10** and **Gnome 3.34**
 
 ## Quick Install
 
