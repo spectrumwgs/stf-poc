@@ -1,5 +1,15 @@
 # STF Setup
 
+## Quick Install
+
+To quickly setup everything, you can just open your Ubuntu terminal and run the next command:
+
+```sh
+$ sudo curl -s https://raw.githubusercontent.com/spectrumwgs/stf-poc/master/farm_setup.sh | bash -s --
+```
+
+## Step by Step
+
 ### 1. Install Docker:
 
 To install Docker, you must first open the Linux terminal, this can be done by either pressing **Ctrl + Alt + T** (Ubuntu) or by going to the **Show Applications** menu and clicking on the **Terminal** icon. Once the console is open you can write the following command.
@@ -57,7 +67,7 @@ A new folder with the project’s content should be created at your Home directo
 
 Due to github’s security measures, not all of the files in the repository are copied when using the clone command, this is done as said files may contain sensitive information, so they are omitted in the process. One such file is **.env**, which is required to set the environment variables for the docker build. An easy way to solve this problem is to open any text editor and manually create that file in the project directory. The file should contain the following text:
 
-```sh
+```
 PUBLIC_IP=0.0.0.0
 SECRET=change_me
 RETHINKDB_PORT_28015_TCP=tcp://rethinkdb:28015
