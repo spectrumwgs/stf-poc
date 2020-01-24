@@ -96,10 +96,14 @@ $ sudo docker-compose up -d --build
 If everything up to this point was done correctly, you should be able to access the device farm in your browser through the **PUBLIC_IP** you previously defined.
 
 ## References
-  - [Original STF repository][Repo]
-  - [Original STF configuration post][Post]
+  - [Ubuntu download link][Dwld]
+  - [Original OpenSTF website [OStf]
+  - [Docker-compose STF repository][Repo]
+  - [Docker-compose STF configuration post][Post]
   - [RethinkDB installation documentation][ReDB]
 
+[Dwld]: <http://releases.ubuntu.com/19.10/ubuntu-19.10-desktop-amd64.iso?_ga=2.208302160.351755930.1579897946-533501981.1579552170>
+[OStf]: <https://openstf.io/>
 [Repo]: <https://github.com/nikosch86/stf-poc>
 [Post]: <https://medium.com/@nikosch86/getting-started-with-automated-in-house-testing-on-android-smartphones-using-stf-dafecee4a8ee>
 [ReDB]: <https://rethinkdb.com/docs/install/ubuntu>
