@@ -10,7 +10,7 @@ git clone https://github.com/spectrumwgs/stf-poc
 cd stf-poc
 sudo mv env.txt .env
 
-gnome-terminal -- bash -c "sudo rethinkdb --bind all; bash" &
+sudo gnome-terminal -- bash -c "sudo rethinkdb --bind all; bash" &
 
 sudo docker-compose up -d --build
 
