@@ -10,6 +10,18 @@ To quickly setup everything, you can just open your Ubuntu terminal and run the 
 $ sudo curl -s https://raw.githubusercontent.com/spectrumwgs/stf-poc/master/farm_setup.sh | bash -s --
 ```
 
+If you want to change the **PUBLIC_IP**, **SECRET** or **STATION_NAME** of the farm, you can do so by editing the **.env** file with any text editor, but first, you must shut down docker. You can do so by using the following command:
+
+```sh
+$ sudo docker stop $(sudo docker ps -a -q)
+```
+
+After doing the appropiate changed to the environment file, you can now rebuild docker and start the farm again with this command (using a terminal that was launched within the cloned git project):
+
+```sh
+$ sudo docker-compose up -d --build
+```
+
 ## Step by Step
 
 ### 1. Install Docker:
