@@ -1,3 +1,5 @@
+# Smartphone Test Farm
+
 # Requirements
   - Ubuntu 19.10
   - Docker
@@ -79,11 +81,9 @@ $ sudo docker-compose up --build
   - [Docker-compose STF repository][Repo]
   - [Docker-compose STF configuration post][Post]
   - [Alternative docker-compose STF configuration post][PAlt]
-  - [RethinkDB installation documentation][ReDB]
 
 [Dwld]: <http://releases.ubuntu.com/19.10/ubuntu-19.10-desktop-amd64.iso?_ga=2.208302160.351755930.1579897946-533501981.1579552170>
 [OStf]: <https://openstf.io/>
 [Repo]: <https://github.com/nikosch86/stf-poc>
 [Post]: <https://medium.com/@nikosch86/getting-started-with-automated-in-house-testing-on-android-smartphones-using-stf-dafecee4a8ee>
 [PAlt]: <https://testerhome.com/topics/17233>
-[ReDB]: <https://rethinkdb.com/docs/install/ubuntu>
