@@ -1,5 +1,3 @@
-# Smartphone Test Farm
-
 # Requirements
   - Ubuntu 19.10
   - Docker
@@ -74,6 +72,8 @@ Open a new terminal in the directory where the STF repository was saved
 ```sh
 $ sudo docker-compose up --build
 ```
+
+Now you should be able to access the STF UI and your devices by going to **http://10.0.110.40/** on your browser
 
 ## References
   - [Ubuntu download link][Dwld]
