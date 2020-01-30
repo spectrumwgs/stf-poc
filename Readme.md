@@ -1,5 +1,3 @@
-# Smartphone Test Farm
-
 # Requirements
   - Ubuntu 19.10
   - Docker
