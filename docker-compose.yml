@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 volumes:
   rethinkdb:
@@ -6,134 +6,127 @@ volumes:
 
 services:
   nginx:
-    build: nginx/
+    image: nginx:1.15.7-alpine
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    restart: unless-stopped
-    ports:
-      - 80:80
-    depends_on:
-      - app
-      - auth
-      - storage-plugin-apk
-      - storage-plugin-image
-      - storage-temp
-      - websocket
-      - api
+    network_mode: "host"
+
   adb:
     image: sorccu/adb:latest
     restart: unless-stopped
     privileged: true
     volumes:
       - /dev/bus/usb:/dev/bus/usb
+
   rethinkdb:
-    image: rethinkdb:2.3
-    restart: unless-stopped
+    depends_on:
+      - nginx
+    image: rethinkdb:2.3.6
+    command: rethinkdb --bind all --cache-size 8192 --http-port 8090 --no-update-check
     volumes:
       - rethinkdb:/data
-  app:
-    image: openstf/stf:latest
-    restart: unless-stopped
-    environment:
-      - RETHINKDB_PORT_28015_TCP
-      - SECRET
-    command: stf app --auth-url http://${PUBLIC_IP}/auth/mock/ --websocket-url ws://${PUBLIC_IP}/ --port 3000
+    network_mode: "host"
+
+  stf-migrate:
     depends_on:
       - rethinkdb
-      - auth
-      - websocket
-  auth:
-    image: openstf/stf:latest
-    restart: unless-stopped
-    environment:
-      - SECRET
-    command: stf auth-mock --app-url http://${PUBLIC_IP}/ --port 3000
-  processor:
-    image: openstf/stf:latest
-    restart: unless-stopped
-    environment:
-      - RETHINKDB_PORT_28015_TCP
-    command: stf processor --connect-app-dealer tcp://triproxy:7160 --connect-dev-dealer tcp://dev-triproxy:7260
-    depends_on:
-      - rethinkdb
-      - triproxy
-      - dev-triproxy
-  triproxy:
-    image: openstf/stf:latest
-    restart: unless-stopped
-    command: stf triproxy app --bind-pub "tcp://*:7150" --bind-dealer "tcp://*:7160" --bind-pull "tcp://*:7170"
-  dev-triproxy:
-    image: openstf/stf:latest
-    restart: unless-stopped
-    command: stf triproxy dev --bind-pub "tcp://*:7250" --bind-dealer "tcp://*:7260" --bind-pull "tcp://*:7270"
-  migrate:
-    image: openstf/stf:latest
-    environment:
-      - RETHINKDB_PORT_28015_TCP
+    image: $STF_IMAGE
     command: stf migrate
+    network_mode: "host"
+
+  stf-provider:
+    image: $STF_IMAGE
+    command: stf provider --name "${STF_PROVIDER}" --connect-sub tcp://$STF_HOST:7250 --connect-push tcp://$STF_HOST:7270 --storage-url $STF_URL --public-ip $STF_HOST --min-port=15000 --max-port=25000 --heartbeat-interval 20000 --screen-ws-url-pattern "ws://${STF_HOST}/d/${STF_PROVIDER}/<%= serial %>/<%= publicPort %>/"
+    network_mode: "host"
+
+  stf-app:
     depends_on:
-      - rethinkdb
-  provider:
-    image: openstf/stf:latest
-    restart: unless-stopped
-    command: stf provider --name ${STATION_NAME} --connect-sub tcp://dev-triproxy:7250 --connect-push tcp://dev-triproxy:7270 --storage-url http://${PUBLIC_IP}/ --public-ip ${PUBLIC_IP} --heartbeat-interval 10000 --screen-ws-url-pattern "ws://${PUBLIC_IP}/d/nuc/<%= serial %>/<%= publicPort %>/" --adb-host adb --min-port 7400 --max-port 7700
-    ports:
-      - 7400-7700:7400-7700
-    depends_on:
-      - adb
-      - dev-triproxy
-      - triproxy
-      - storage-temp
-  reaper:
-    image: openstf/stf:latest
-    restart: unless-stopped
+      - stf-migrate
+    image: $STF_IMAGE
+    command: stf app --port 3100 --auth-url ${STF_URL}/auth/mock/ --websocket-url ws://${STF_HOST}/
+    network_mode: "host"
     environment:
-      - RETHINKDB_PORT_28015_TCP
+      SECRET: $STF_SECRET
+
+  stf-auth:
     depends_on:
-      - migrate
-      - rethinkdb
-      - dev-triproxy
-      - triproxy
-    command: stf reaper dev --connect-push tcp://dev-triproxy:7270 --connect-sub tcp://triproxy:7150 --heartbeat-timeout 30000
-  storage-plugin-apk:
-    image: openstf/stf:latest
-    restart: unless-stopped
-    command: stf storage-plugin-apk --port 3000 --storage-url http://${PUBLIC_IP}/
-    depends_on:
-      - storage-temp
-  storage-plugin-image:
-    image: openstf/stf:latest
-    restart: unless-stopped
-    command: stf storage-plugin-image --port 3000 --storage-url http://${PUBLIC_IP}/
-    depends_on:
-      - storage-temp
-  storage-temp:
-    build: storage-temp/
-    restart: unless-stopped
-    volumes:
-      - storage-temp:/app/data
-    command: stf storage-temp --port 3000 --save-dir /app/data
-  websocket:
-    image: openstf/stf:latest
-    restart: unless-stopped
+      - stf-app
+    image: $STF_IMAGE
+    command: stf auth-mock --port 3101 --app-url ${STF_URL}
+    network_mode: "host"
     environment:
-      - SECRET
-      - RETHINKDB_PORT_28015_TCP
-    command: stf websocket --port 3000 --storage-url http://${PUBLIC_IP}/ --connect-sub tcp://triproxy:7150 --connect-push tcp://triproxy:7170
+      SECRET: $STF_SECRET
+
+  stf-storage-plugin-apk:
     depends_on:
-      - migrate
-      - rethinkdb
-      - storage-temp
-      - triproxy
-      - dev-triproxy
-  api:
-    image: openstf/stf:latest
-    restart: unless-stopped
+      - stf-api
+    image: $STF_IMAGE
+    command: stf storage-plugin-apk --port 3102 --storage-url ${STF_URL}
+    network_mode: "host"
+
+  stf-storage-plugin-image:
+    depends_on:
+      - stf-storage-plugin-apk
+    image: $STF_IMAGE
+    command: stf storage-plugin-image --port 3103 --storage-url $STF_URL
+    network_mode: "host"
+
+  stf-storage-temp:
+    depends_on:
+      - stf-storage-plugin-image
+    image: $STF_IMAGE
+    command: stf storage-temp --port 3104 --save-dir /tmp
+    network_mode: "host"
+
+  stf-websocket:
+    depends_on:
+      - stf-auth
+    image: $STF_IMAGE
+    command: stf websocket --port 3105 --storage-url $STF_URL --connect-sub tcp://$STF_HOST:7150 --connect-push tcp://$STF_HOST:7170
+    network_mode: "host"
     environment:
-      - SECRET
-      - RETHINKDB_PORT_28015_TCP
-    command: stf api --port 3000 --connect-sub tcp://triproxy:7150 --connect-push tcp://triproxy:7170
+      SECRET: $STF_SECRET
+
+  stf-api:
     depends_on:
-      - migrate
-      - rethinkdb
-      - triproxy
+      - stf-websocket
+    image: $STF_IMAGE
+    command: stf api --port 3106 --connect-sub tcp://$STF_HOST:7150 --connect-push tcp://$STF_HOST:7170
+    network_mode: "host"
+    environment:
+      SECRET: $STF_SECRET
+
+  stf-triproxy-app:
+    depends_on:
+      - stf-storage-temp
+    image: $STF_IMAGE
+    command: stf triproxy app --bind-pub "tcp://*:7150" --bind-dealer "tcp://*:7160" --bind-pull "tcp://*:7170"
+    network_mode: "host"
+
+  stf-processor:
+    depends_on:
+      - stf-triproxy-app
+    image: $STF_IMAGE
+    command: stf processor stf-processer --connect-app-dealer tcp://$STF_HOST:7160 --connect-dev-dealer tcp://$STF_HOST:7260
+    network_mode: "host"
+
+  stf-triproxy-dev:
+    depends_on:
+      - stf-processor
+    image: $STF_IMAGE
+    command: stf triproxy dev --bind-pub "tcp://*:7250" --bind-dealer "tcp://*:7260" --bind-pull "tcp://*:7270"
+    network_mode: "host"
+
+  stf-reaper:
+    depends_on:
+      - stf-triproxy-dev
+    image: $STF_IMAGE
+    command: stf reaper dev --connect-push tcp://$STF_HOST:7270 --connect-sub tcp://$STF_HOST:7150 --heartbeat-timeout 30000
+    network_mode: "host"
+
+  stf-log-rethinkdb:
+    depends_on:
+      - stf-reaper
+    image: $STF_IMAGE
+    command: stf log-rethinkdb --connect-sub tcp://$STF_HOST:7150
+    network_mode: "host"
