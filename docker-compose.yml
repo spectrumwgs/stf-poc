@@ -43,7 +43,7 @@ services:
     depends_on:
       - stf-migrate
     image: $STF_IMAGE
-    command: stf app --port 3100 --auth-url ${STF_URL}/auth/mock/ --websocket-url ws://${STF_HOST}/
+    command: stf app --port 3100 --auth-url ${STF_URL}/auth/oauth/ --websocket-url ws://${STF_HOST}/
     network_mode: "host"
     environment:
       SECRET: $STF_SECRET
@@ -52,10 +52,17 @@ services:
     depends_on:
       - stf-app
     image: $STF_IMAGE
-    command: stf auth-mock --port 3101 --app-url ${STF_URL}
+    command: stf auth-oauth2 --port 3101 --app-url ${STF_URL}
     network_mode: "host"
     environment:
       SECRET: $STF_SECRET
+      OAUTH_AUTHORIZATION_URL: https://accounts.google.com/o/oauth2/v2/auth
+      OAUTH_TOKEN_URL: https://www.googleapis.com/oauth2/v4/token
+      OAUTH_USERINFO_URL: https://www.googleapis.com/oauth2/v3/userinfo
+      OAUTH_CLIENT_ID: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.apps.googleusercontent.com
+      OAUTH_CLIENT_SECRET: BBBBBBBBBBBBBBBBBBBBBBBB
+      OAUTH_CALLBACK_URL: https://stf.example.org/auth/oauth/callback
+      OAUTH_SCOPE: openid email
 
   stf-storage-plugin-apk:
     depends_on:
