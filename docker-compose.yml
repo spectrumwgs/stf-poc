@@ -36,7 +36,7 @@ services:
 
   stf-provider:
     image: $STF_IMAGE
-    command: stf provider --name "${STF_PROVIDER}" --connect-sub tcp://$STF_HOST:7250 --connect-push tcp://$STF_HOST:7270 --storage-url $STF_URL --public-ip $STF_HOST --min-port=15000 --max-port=25000 --heartbeat-interval 20000 --screen-ws-url-pattern "ws://${STF_HOST}/d/${STF_PROVIDER}/<%= serial %>/<%= publicPort %>/"
+    command: stf provider --name "${STF_PROVIDER}" --connect-sub tcp://devside.$STF_HOST:7250 --connect-push tcp://devside.$STF_HOST:7270 --storage-url $STF_URL --public-ip $STF_PROVIDER.$STF_HOST --min-port=15000 --max-port=25000 --heartbeat-interval 20000 --screen-ws-url-pattern "ws://${STF_HOST}/d/${STF_PROVIDER}/<%= serial %>/<%= publicPort %>/"
     network_mode: "host"
 
   stf-app:
@@ -135,5 +135,5 @@ services:
     depends_on:
       - stf-reaper
     image: $STF_IMAGE
-    command: stf log-rethinkdb --connect-sub tcp://$STF_HOST:7150
+    command: stf log-rethinkdb --connect-sub tcp://devside.$STF_HOST:7150
     network_mode: "host"
