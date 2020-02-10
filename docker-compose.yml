@@ -61,7 +61,7 @@ services:
       OAUTH_USERINFO_URL: https://www.googleapis.com/oauth2/v3/userinfo
       OAUTH_CLIENT_ID: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.apps.googleusercontent.com
       OAUTH_CLIENT_SECRET: BBBBBBBBBBBBBBBBBBBBBBBB
-      OAUTH_CALLBACK_URL: https://stf.example.org/auth/oauth/callback
+      OAUTH_CALLBACK_URL: https://stf.itexico.com/auth/oauth/callback
       OAUTH_SCOPE: openid email
 
   stf-storage-plugin-apk:
